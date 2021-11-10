@@ -1,17 +1,19 @@
-package com.technopark.youtrader.network
+package com.technopark.youtrader.network.auth
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class FirebaseService : IAuthService {
+class FirebaseService : AuthService() {
     private var auth: FirebaseAuth = Firebase.auth
 
     override fun checkSignIn(email: String): Boolean {
         val user = auth.currentUser
         if (user != null && user.email == email) {
             Log.d(TAG, "User: $email logged in already")
+            _authResponseState.value = FirebaseResponseState.SignedIn
+            Log.d(TAG, "Current state: ${authResponseState.value.toString()}")
             return true
         }
         Log.d(TAG, "User: $email isn't logged in")
@@ -26,6 +28,8 @@ class FirebaseService : IAuthService {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.d(TAG, "signInWithEmail:success")
+                        _authResponseState.value = FirebaseResponseState.SuccessfulSignIn
+                        Log.d(TAG, "Current state: ${authResponseState.value.toString()}")
                     } else {
                         Log.d(TAG, "signInWithEmail:failure", task.exception)
                     }
@@ -48,6 +52,8 @@ class FirebaseService : IAuthService {
 
     override fun sighOut() {
         Log.d(TAG, "sighOut")
+        _authResponseState.value = FirebaseResponseState.SuccessfulSignOut
+        Log.d(TAG, "Current state: ${authResponseState.value.toString()}")
         auth.signOut()
     }
 

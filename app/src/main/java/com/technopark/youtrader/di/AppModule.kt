@@ -7,8 +7,11 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.technopark.youtrader.R
 import com.technopark.youtrader.database.AppDatabase
 import com.technopark.youtrader.network.CryptoCurrencyApi
-import com.technopark.youtrader.network.FirebaseService
-import com.technopark.youtrader.network.IAuthService
+import com.technopark.youtrader.network.auth.AuthService
+import com.technopark.youtrader.network.auth.AuthService.Companion.getDefaultValue
+import com.technopark.youtrader.network.auth.FirebaseResponseState
+import com.technopark.youtrader.network.auth.FirebaseService
+import com.technopark.youtrader.network.auth.IAuthService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -55,10 +58,16 @@ class AppModule {
         fun provideCryptoCurrencyApi(retrofit: Retrofit): CryptoCurrencyApi =
             retrofit.create(CryptoCurrencyApi::class.java)
 
+//        @Singleton
+//        @Provides
+//        fun provideFirebaseService(): IAuthService {
+//            return FirebaseService()
+//        }
+
         @Singleton
         @Provides
-        fun provideFirebaseService(): IAuthService {
-            return FirebaseService()
+        fun provideFirebaseService(): AuthService {
+            return FirebaseService().apply { getDefaultValue(FirebaseResponseState) }
         }
     }
 }
